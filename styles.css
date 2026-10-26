@@ -1,0 +1,436 @@
+/* ============================================================
+   GridOptima Tariff & Demand Analyzer — Dashboard Stylesheet
+   Executive-grade industrial analytics UI
+   ============================================================ */
+
+/* ---------- CSS Custom Properties ---------- */
+:root {
+  --color-bg: #f1f5f9;
+  --color-surface: #ffffff;
+  --color-header: #0f172a;
+  --color-header-accent: #1e3a5f;
+  --color-text: #1e293b;
+  --color-text-muted: #64748b;
+  --color-border: #e2e8f0;
+  --color-accent-blue: #3b82f6;
+  --color-accent-green: #22c55e;
+  --color-accent-red: #ef4444;
+  --color-accent-amber: #f59e0b;
+  --color-accent-purple: #8b5cf6;
+  --radius-card: 12px;
+  --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.06);
+  --shadow-card-hover: 0 4px 12px rgba(0, 0, 0, 0.10);
+  --font-stack: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, sans-serif;
+  --transition-fast: 0.2s ease;
+}
+
+/* ---------- Reset & Base ---------- */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { font-size: 16px; scroll-behavior: smooth; }
+
+body {
+  font-family: var(--font-stack);
+  background: var(--color-bg);
+  color: var(--color-text);
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+/* ---------- Header ---------- */
+.header {
+  background: linear-gradient(135deg, var(--color-header) 0%, var(--color-header-accent) 100%);
+  color: #fff;
+  padding: 1.25rem 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.18);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.header__brand {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.header__logo {
+  font-size: 1.75rem;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+}
+
+.header__logo span { color: var(--color-accent-green); }
+
+.header__tagline {
+  font-size: 0.85rem;
+  color: #94a3b8;
+  font-weight: 400;
+}
+
+.header__badge {
+  background: rgba(59, 130, 246, 0.2);
+  color: #93c5fd;
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+/* ---------- Main Container ---------- */
+.main {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 1.5rem 2rem 3rem;
+}
+
+/* ---------- CSV Upload Zone ---------- */
+.upload-zone {
+  border: 2px dashed var(--color-border);
+  border-radius: var(--radius-card);
+  background: var(--color-surface);
+  padding: 1rem 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  transition: border-color var(--transition-fast), background var(--transition-fast);
+  cursor: pointer;
+}
+
+.upload-zone:hover,
+.upload-zone.dragover {
+  border-color: var(--color-accent-blue);
+  background: #eff6ff;
+}
+
+.upload-zone__icon { font-size: 1.5rem; }
+
+.upload-zone__text {
+  font-size: 0.9rem;
+  color: var(--color-text-muted);
+}
+
+.upload-zone__text strong { color: var(--color-accent-blue); }
+
+.upload-zone input[type="file"] { display: none; }
+
+.upload-zone__status {
+  font-size: 0.8rem;
+  padding: 0.2rem 0.6rem;
+  border-radius: 6px;
+  font-weight: 600;
+}
+
+.upload-zone__status--loaded {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.upload-zone__status--fallback {
+  background: #fef9c3;
+  color: #854d0e;
+}
+
+/* ---------- Section Titles ---------- */
+.section-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--color-text);
+  margin: 1.75rem 0 0.75rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.section-title__icon {
+  font-size: 1.2rem;
+}
+
+/* ---------- KPI Cards Grid ---------- */
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.kpi-card {
+  background: var(--color-surface);
+  border-radius: var(--radius-card);
+  padding: 1.25rem 1.5rem;
+  box-shadow: var(--shadow-card);
+  transition: box-shadow var(--transition-fast), transform var(--transition-fast);
+  position: relative;
+  overflow: hidden;
+}
+
+.kpi-card:hover {
+  box-shadow: var(--shadow-card-hover);
+  transform: translateY(-2px);
+}
+
+.kpi-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+}
+
+.kpi-card--breach::before { background: var(--color-accent-red); }
+.kpi-card--penalty::before { background: var(--color-accent-amber); }
+.kpi-card--apfc::before { background: var(--color-accent-blue); }
+.kpi-card--vfd::before { background: var(--color-accent-green); }
+
+.kpi-card__label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--color-text-muted);
+  margin-bottom: 0.5rem;
+}
+
+.kpi-card__value {
+  font-size: 2.25rem;
+  font-weight: 800;
+  line-height: 1.1;
+  margin-bottom: 0.25rem;
+}
+
+.kpi-card--breach .kpi-card__value { color: var(--color-accent-red); }
+.kpi-card--penalty .kpi-card__value { color: var(--color-accent-amber); }
+.kpi-card--apfc .kpi-card__value { color: var(--color-accent-blue); }
+.kpi-card--vfd .kpi-card__value { color: var(--color-accent-green); }
+
+.kpi-card__detail {
+  font-size: 0.82rem;
+  color: var(--color-text-muted);
+  line-height: 1.4;
+}
+
+/* Detuned Reactor Alert Badge */
+.alert-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  margin-top: 0.5rem;
+  padding: 0.25rem 0.65rem;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.alert-badge--warning {
+  background: #fef3c7;
+  color: #92400e;
+  animation: pulse-badge 2s ease-in-out infinite;
+}
+
+.alert-badge--ok {
+  background: #dcfce7;
+  color: #166534;
+}
+
+@keyframes pulse-badge {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
+}
+
+/* ---------- Simulation Controls ---------- */
+.sim-panel {
+  background: var(--color-surface);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card);
+  padding: 1.25rem 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.sim-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+}
+
+.sim-control__label {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--color-text);
+  margin-bottom: 0.5rem;
+}
+
+.sim-control__badge {
+  background: var(--color-accent-blue);
+  color: #fff;
+  padding: 0.15rem 0.55rem;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  min-width: 3.2rem;
+  text-align: center;
+}
+
+.sim-control__badge--green { background: var(--color-accent-green); }
+.sim-control__badge--purple { background: var(--color-accent-purple); }
+
+/* Custom range slider */
+.sim-control input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 6px;
+  border-radius: 3px;
+  background: var(--color-border);
+  outline: none;
+  cursor: pointer;
+}
+
+.sim-control input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--color-accent-blue);
+  border: 3px solid #fff;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+  cursor: grab;
+  transition: transform var(--transition-fast);
+}
+
+.sim-control input[type="range"]::-webkit-slider-thumb:hover {
+  transform: scale(1.15);
+}
+
+.sim-control input[type="range"]::-moz-range-thumb {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--color-accent-blue);
+  border: 3px solid #fff;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+  cursor: grab;
+}
+
+.sim-control__hint {
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+  margin-top: 0.35rem;
+}
+
+/* ---------- Charts Grid ---------- */
+.charts-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.chart-card {
+  background: var(--color-surface);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card);
+  padding: 1.25rem;
+}
+
+.chart-card__title {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--color-text);
+  margin-bottom: 0.75rem;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.chart-card canvas {
+  width: 100% !important;
+  max-height: 320px;
+}
+
+/* ---------- ROI Payback Card ---------- */
+.roi-card {
+  background: linear-gradient(135deg, var(--color-header) 0%, var(--color-header-accent) 100%);
+  color: #fff;
+  border-radius: var(--radius-card);
+  padding: 1.5rem 2rem;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.5rem;
+  align-items: center;
+  box-shadow: 0 4px 16px rgba(15, 23, 42, 0.25);
+}
+
+.roi-item__label {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #94a3b8;
+  margin-bottom: 0.3rem;
+}
+
+.roi-item__value {
+  font-size: 1.75rem;
+  font-weight: 800;
+}
+
+.roi-item__value--highlight { color: var(--color-accent-green); }
+
+/* ---------- Footer ---------- */
+.footer {
+  text-align: center;
+  padding: 2rem 1rem 1rem;
+  color: var(--color-text-muted);
+  font-size: 0.8rem;
+}
+
+.footer a {
+  color: var(--color-accent-blue);
+  text-decoration: none;
+}
+
+.footer a:hover { text-decoration: underline; }
+
+/* ---------- Responsive ---------- */
+@media (max-width: 1024px) {
+  .kpi-grid { grid-template-columns: repeat(2, 1fr); }
+  .sim-grid { grid-template-columns: repeat(2, 1fr); }
+  .roi-card { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 768px) {
+  .main { padding: 1rem; }
+  .header { padding: 1rem; }
+  .header__logo { font-size: 1.35rem; }
+  .kpi-grid { grid-template-columns: 1fr; }
+  .charts-grid { grid-template-columns: 1fr; }
+  .sim-grid { grid-template-columns: 1fr; }
+  .roi-card { grid-template-columns: 1fr; }
+  .kpi-card__value { font-size: 1.75rem; }
+}
+
+/* ---------- Utility ---------- */
+.sr-only {
+  position: absolute;
+  width: 1px; height: 1px;
+  padding: 0; margin: -1px;
+  overflow: hidden;
+  clip: rect(0,0,0,0);
+  white-space: nowrap;
+  border: 0;
+}

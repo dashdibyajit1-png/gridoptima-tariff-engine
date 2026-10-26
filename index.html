@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GridOptima — Tariff &amp; Demand Analyzer</title>
+  <meta name="description" content="Industrial electricity tariff analyzer with demand ratchet, APFC capacitor sizing, TOD load shifting, and VFD savings simulation.">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>">
+  <link rel="stylesheet" href="styles.css">
+  <!-- Chart.js v4 via CDN — zero local install -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+</head>
+<body>
+
+  <!-- ========== HEADER ========== -->
+  <header class="header">
+    <div class="header__brand">
+      <div>
+        <div class="header__logo">Grid<span>Optima</span></div>
+        <div class="header__tagline">Tariff &amp; Demand Analyzer</div>
+      </div>
+    </div>
+    <div class="header__badge">Industrial Energy Analytics</div>
+  </header>
+
+  <!-- ========== MAIN CONTENT ========== -->
+  <main class="main">
+
+    <!-- CSV Upload Zone -->
+    <div class="upload-zone" id="upload-zone" role="button" tabindex="0" aria-label="Upload CSV billing data">
+      <span class="upload-zone__icon">📁</span>
+      <span class="upload-zone__text">
+        <strong>Drop CSV here</strong> or click to upload a custom 12-month billing dataset
+      </span>
+      <input type="file" id="csv-input" accept=".csv" aria-hidden="true">
+      <span class="upload-zone__status upload-zone__status--fallback" id="data-source-badge">Loading…</span>
+    </div>
+
+    <!-- ========== KPI CARDS ========== -->
+    <div class="section-title">
+      <span class="section-title__icon">📊</span> Key Performance Indicators
+    </div>
+    <div class="kpi-grid">
+
+      <!-- Card 1: Demand Breaches -->
+      <div class="kpi-card kpi-card--breach">
+        <div class="kpi-card__label">Demand Breaches</div>
+        <div class="kpi-card__value" id="kpi-breach-value">—</div>
+        <div class="kpi-card__detail" id="kpi-breach-detail">Months exceeding contracted kVA</div>
+      </div>
+
+      <!-- Card 2: Total PF Penalties -->
+      <div class="kpi-card kpi-card--penalty">
+        <div class="kpi-card__label">Total Penalties</div>
+        <div class="kpi-card__value" id="kpi-penalty-value">—</div>
+        <div class="kpi-card__detail" id="kpi-penalty-detail">Demand + PF penalties (annual)</div>
+      </div>
+
+      <!-- Card 3: APFC Recommendation -->
+      <div class="kpi-card kpi-card--apfc">
+        <div class="kpi-card__label">Recommended APFC Bank</div>
+        <div class="kpi-card__value" id="kpi-apfc-value">—</div>
+        <div class="kpi-card__detail" id="kpi-apfc-detail">Capacitor bank sizing (peak month)</div>
+        <div class="alert-badge" id="kpi-apfc-badge" style="display:none;"></div>
+      </div>
+
+      <!-- Card 4: VFD Annual Savings -->
+      <div class="kpi-card kpi-card--vfd">
+        <div class="kpi-card__label">VFD Annual Savings</div>
+        <div class="kpi-card__value" id="kpi-vfd-value">—</div>
+        <div class="kpi-card__detail" id="kpi-vfd-detail">kWh &amp; INR saved per year</div>
+      </div>
+
+    </div>
+
+    <!-- ========== SIMULATION CONTROLS ========== -->
+    <div class="section-title">
+      <span class="section-title__icon">🎛️</span> Simulation Controls
+    </div>
+    <div class="sim-panel">
+      <div class="sim-grid">
+
+        <!-- Slider 1: Target Power Factor -->
+        <div class="sim-control">
+          <div class="sim-control__label">
+            Target Power Factor
+            <span class="sim-control__badge" id="badge-pf">0.95</span>
+          </div>
+          <input type="range" id="slider-pf" min="0.80" max="0.99" step="0.01" value="0.95">
+          <div class="sim-control__hint">APFC capacitor bank sized for this target PF</div>
+        </div>
+
+        <!-- Slider 2: VFD Speed Reduction -->
+        <div class="sim-control">
+          <div class="sim-control__label">
+            VFD Motor Speed Reduction
+            <span class="sim-control__badge sim-control__badge--green" id="badge-vfd">15%</span>
+          </div>
+          <input type="range" id="slider-vfd" min="0" max="30" step="1" value="15">
+          <div class="sim-control__hint">Affinity law: Power ∝ Speed³ for centrifugal loads</div>
+        </div>
+
+        <!-- Slider 3: TOD Load Shift -->
+        <div class="sim-control">
+          <div class="sim-control__label">
+            Peak → Off-Peak Load Shift
+            <span class="sim-control__badge sim-control__badge--purple" id="badge-tod">20%</span>
+          </div>
+          <input type="range" id="slider-tod" min="0" max="50" step="1" value="20">
+          <div class="sim-control__hint">Percentage of peak consumption shifted to off-peak hours</div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ========== CHARTS GRID ========== -->
+    <div class="section-title">
+      <span class="section-title__icon">📈</span> Analytics Dashboard
+    </div>
+    <div class="charts-grid">
+
+      <!-- Chart 1: Demand Ratchet -->
+      <div class="chart-card">
+        <div class="chart-card__title">⚡ Contracted vs Recorded Maximum Demand</div>
+        <canvas id="chart-demand" height="300"></canvas>
+      </div>
+
+      <!-- Chart 2: PF & THD -->
+      <div class="chart-card">
+        <div class="chart-card__title">🔌 Power Factor &amp; THD Trend</div>
+        <canvas id="chart-pf-thd" height="300"></canvas>
+      </div>
+
+      <!-- Chart 3: TOD Split -->
+      <div class="chart-card">
+        <div class="chart-card__title">🕐 Time-of-Day Energy Split</div>
+        <canvas id="chart-tod" height="300"></canvas>
+      </div>
+
+      <!-- Chart 4: Cumulative Savings -->
+      <div class="chart-card">
+        <div class="chart-card__title">💰 Cumulative Annual Savings Projection</div>
+        <canvas id="chart-savings" height="300"></canvas>
+      </div>
+
+    </div>
+
+    <!-- ========== ROI PAYBACK CARD ========== -->
+    <div class="section-title">
+      <span class="section-title__icon">🏦</span> Return on Investment
+    </div>
+    <div class="roi-card">
+      <div class="roi-item">
+        <div class="roi-item__label">Total Capital Expenditure</div>
+        <div class="roi-item__value" id="roi-capex">—</div>
+      </div>
+      <div class="roi-item">
+        <div class="roi-item__label">Annual Savings (APFC + VFD + TOD)</div>
+        <div class="roi-item__value roi-item__value--highlight" id="roi-savings">—</div>
+      </div>
+      <div class="roi-item">
+        <div class="roi-item__label">Payback Period</div>
+        <div class="roi-item__value roi-item__value--highlight" id="roi-payback">—</div>
+      </div>
+      <div class="roi-item">
+        <div class="roi-item__label">Net First-Year Return</div>
+        <div class="roi-item__value" id="roi-net">—</div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- ========== FOOTER ========== -->
+  <footer class="footer">
+    <p>GridOptima Tariff &amp; Demand Analyzer &mdash; Industrial Energy Analytics Dashboard</p>
+    <p>Engineering formulas: Demand Ratchet &bull; APFC with THD Derating &bull; VFD Affinity Law &bull; TOD Load Shifting</p>
+    <p>Built with HTML5, CSS3, Vanilla JS &amp; <a href="https://www.chartjs.org/" target="_blank" rel="noopener">Chart.js</a></p>
+  </footer>
+
+  <!-- Application Script (after DOM) -->
+  <script src="app.js"></script>
+
+</body>
+</html>
